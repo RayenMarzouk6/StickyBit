@@ -55,6 +55,7 @@ export default function RootLayout({
       <body className="font-sans antialiased bg-background text-foreground transition-colors duration-300">
        
         {children}
+        hello
         <Chatbot />
       </body>
     </html>
