@@ -169,14 +169,14 @@ export function Chatbot() {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-40 p-4 bg-primary text-primary-foreground rounded-full shadow-lg hover:shadow-xl transition-shadow hover:bg-primary/90"
+        className="fixed bottom-6 right-6 z-40 p-3 sm:p-4 bg-primary text-primary-foreground rounded-full shadow-lg hover:shadow-xl transition-shadow hover:bg-primary/90"
         aria-label="فتح المحادثة مع المساعد"
       >
-        {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
+        {isOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />}
       </button>
 
       {isOpen && (
-        <Card className="fixed bottom-20 right-6 z-40 w-96 h-96 flex flex-col shadow-2xl">
+        <Card className="fixed bottom-20 right-6 z-40 w-11/12 max-w-sm h-[70vh] sm:w-96 sm:h-96 flex flex-col shadow-2xl">
           <div className="bg-primary text-primary-foreground p-4 rounded-t-lg">
             <h3 className="font-bold text-lg">مساعدك الآمن</h3>
             <p className="text-sm text-primary-foreground/80">نصائح أمان فورية</p>
@@ -185,7 +185,7 @@ export function Chatbot() {
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((message) => (
               <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-xs ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'} rounded-lg p-3`}>
+                <div className={`max-w-[70%] sm:max-w-xs ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'} rounded-lg p-2 sm:p-3`}>
                   <p className="text-sm">{message.content}</p>
 
                   {message.suggestions && message.suggestions.length > 0 && (
@@ -222,15 +222,15 @@ export function Chatbot() {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                 <div className="bg-muted rounded-lg p-3">
-                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                 </div>
+                <div className="bg-muted rounded-lg p-2">
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                </div>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          <form onSubmit={handleSendMessage} className="border-t p-3 flex gap-2">
+          <form onSubmit={handleSendMessage} className="border-t p-2 sm:p-3 flex gap-2">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
