@@ -49,7 +49,7 @@ export function Header() {
             الرئيسية
           </Link>
           <Link href="/how-attackers-work" className="hover:text-emerald-400 transition-colors">
-            ألعاب
+           كيفاش يسرقوك؟
           </Link>
           <Link href="/simulator" className="hover:text-emerald-400 transition-colors">
             محاكاة
@@ -64,13 +64,13 @@ export function Header() {
             اختبر أمانك
           </Link>
           <Link href="/recovery" className="hover:text-emerald-400 transition-colors">
-            دليل التعافي
+            خطة الطوارئ 
           </Link>
           <Link href="/glossary" className="hover:text-emerald-400 transition-colors">
-            القاموس
+           تعلم المصطلحات
           </Link>
           <Link href="/report" className="hover:text-emerald-400 transition-colors">
-            بلّغ
+           نحذّرو بعضنا
           </Link>
           <Link href="/profile" className="hover:text-emerald-400 transition-colors">
             الإنجازات
