@@ -39,7 +39,7 @@ export function Header() {
         <Link href="/" className="flex items-center gap-2 font-bold text-xl hover:opacity-90 transition-opacity">
           <Shield className="h-8 w-8 text-emerald-400" />
           <span className="text-xl md:text-2xl">
-            Cyber<span className="text-emerald-400">Aman</span>
+            <span className="text-emerald-400">Aman</span>
           </span>
         </Link>
 
