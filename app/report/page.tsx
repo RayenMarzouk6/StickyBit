@@ -60,6 +60,30 @@ const CommunityAlerts = () => {
   const [expandedReport, setExpandedReport] = useState<number | null>(null);
   const [comments, setComments] = useState<{ [key: number]: Comment[] }>({});
   const [newComments, setNewComments] = useState<{ [key: number]: string }>({});
+  const [userUpvotes, setUserUpvotes] = useState<Set<number>>(new Set());
+
+  // Fonction pour formater la date
+  const formatDate = (dateString?: string): string => {
+    if (!dateString) return "الآن";
+    
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return "الآن";
+    if (diffMins < 60) return `منذ ${diffMins} دقيقة`;
+    if (diffHours < 24) return `منذ ${diffHours} ساعة`;
+    if (diffDays < 7) return `منذ ${diffDays} أيام`;
+    
+    return date.toLocaleDateString('ar-TN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
 
   // Initialiser l'utilisateur
   useEffect(() => {
@@ -78,6 +102,7 @@ const CommunityAlerts = () => {
     if (userId) {
       fetchReports();
       checkCanSubmit();
+      fetchUserUpvotes();
     }
   }, [userId]);
 
@@ -96,6 +121,22 @@ const CommunityAlerts = () => {
       setCanSubmit(!data || data.length === 0);
     } catch (error) {
       console.error('Erreur lors de la vérification:', error);
+    }
+  };
+
+  const fetchUserUpvotes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('user_upvotes')
+        .select('report_id')
+        .eq('user_id', userId);
+      
+      if (error) throw error;
+      
+      const upvotedIds = new Set(data?.map(u => u.report_id) || []);
+      setUserUpvotes(upvotedIds);
+    } catch (error) {
+      console.error('Erreur lors du chargement des upvotes:', error);
     }
   };
 
@@ -147,19 +188,36 @@ const CommunityAlerts = () => {
 
   const handleUpvote = async (id: number) => {
     try {
+      // Vérifier si l'utilisateur a déjà upvoté
+      if (userUpvotes.has(id)) {
+        alert('لقد صوتت على هذا البلاغ بالفعل');
+        return;
+      }
+
       const report = reports.find(r => r.id === id);
       if (!report) return;
 
-      const { error } = await supabase
+      // Mettre à jour les upvotes
+      const { error: updateError } = await supabase
         .from('scam_reports')
         .update({ upvotes: report.upvotes + 1 })
         .eq('id', id);
       
-      if (error) throw error;
+      if (updateError) throw updateError;
+
+      // Enregistrer l'upvote de l'utilisateur
+      const { error: insertError } = await supabase
+        .from('user_upvotes')
+        .insert([{ user_id: userId, report_id: id }]);
+      
+      if (insertError) throw insertError;
       
       setReports((prev) =>
         prev.map((r) => (r.id === id ? { ...r, upvotes: r.upvotes + 1 } : r))
       );
+
+      // Ajouter à l'ensemble des upvotes utilisateur
+      setUserUpvotes((prev) => new Set([...prev, id]));
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error);
     }
@@ -324,7 +382,7 @@ const CommunityAlerts = () => {
               <div key={report.id} className="rounded-xl border border-border bg-card p-6">
                 <div className="mb-3 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-foreground">
+                    <span className="rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 px-5 py-2.5 text-sm font-semibold text-white hover:from-emerald-600 hover:to-emerald-700 shadow-lg shadow-emerald-500/20 transition-all hover:scale-105 active:scale-30">
                       {report.type}
                     </span>
                     {report.verified && (
@@ -335,18 +393,12 @@ const CommunityAlerts = () => {
                   </div>
                   <span className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Clock className="h-3 w-3" />
-                    {report.time || report.created_at}
+                    {formatDate(report.created_at)}
                   </span>
                 </div>
                 <h3 className="mb-2 font-bold text-foreground">{report.title}</h3>
                 <p className="mb-4 text-sm text-muted-foreground">{report.description}</p>
-                <button
-                  onClick={() => handleUpvote(report.id)}
-                  className="flex items-center gap-2 rounded-lg border border-border bg-secondary px-3 py-1.5 text-sm text-muted-foreground transition-all hover:border-primary hover:text-primary"
-                >
-                  <ThumbsUp className="h-4 w-4" />
-                  <span>{report.upvotes}</span>
-                </button>
+                
 
                 {/* Comments Section */}
                 <div className="mt-6 border-t border-border pt-4">
