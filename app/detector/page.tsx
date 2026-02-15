@@ -5,162 +5,12 @@ import { Header } from '@/components/shared/header'
 import { Footer } from '@/components/shared/footer'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { AlertTriangle, CheckCircle, Info, Upload, X, Link2, Shield } from 'lucide-react'
+import { AlertTriangle, CheckCircle, Info, Link2, Shield } from 'lucide-react'
 
 type RiskLevel = null | 'safe' | 'suspicious' | 'danger'
 
-const mockAnalyses = [
-  {
-    keyword: 'تأكيد الهوية',
-    risk: 'danger',
-    message: 'كلمات شائعة في رسائل التصيد الاحتيالي'
-  },
-  {
-    keyword: 'انقر هنا',
-    risk: 'suspicious',
-    message: 'رسائل مريبة تحتوي على روابط غير متوقعة'
-  },
-  {
-    keyword: 'bit.ly',
-    risk: 'danger',
-    message: 'روابط مختصرة مريبة - قد تخفي عنوان الموقع الحقيقي'
-  },
-  {
-    keyword: 'فعّل حسابك',
-    risk: 'danger',
-    message: 'طلب تفعيل أو تأكيد - علامة تصيد'
-  },
-  {
-    keyword: 'عاجل',
-    risk: 'suspicious',
-    message: 'إنشاء جو من الضغط والاستعجالية'
-  },
-  {
-    keyword: 'جائزة',
-    risk: 'danger',
-    message: 'وعود بجوائز مجانية - احتيال شائع'
-  },
-  {
-    keyword: 'ربحت',
-    risk: 'danger',
-    message: 'وعود بجوائز مجانية - احتيال شائع'
-  },
-  {
-    keyword: 'مبروك',
-    risk: 'suspicious',
-    message: 'قد تكون رسالة تصيد احتيالي'
-  },
-  {
-    keyword: 'فزت',
-    risk: 'danger',
-    message: 'وعود بجوائز مجانية - احتيال شائع'
-  },
-  {
-    keyword: 'فوراً',
-    risk: 'suspicious',
-    message: 'يستعمل أسلوب الاستعجال للضغط'
-  },
-  {
-    keyword: 'آخر فرصة',
-    risk: 'suspicious',
-    message: 'يستعمل أسلوب الاستعجال للضغط'
-  },
-  {
-    keyword: 'سارع',
-    risk: 'suspicious',
-    message: 'يستعمل أسلوب الاستعجال للضغط'
-  },
-  {
-    keyword: 'كلمة السر',
-    risk: 'danger',
-    message: 'يطلب معلومات حساسة'
-  },
-  {
-    keyword: 'رمز التحقق',
-    risk: 'danger',
-    message: 'يطلب معلومات حساسة'
-  },
-  {
-    keyword: 'OTP',
-    risk: 'danger',
-    message: 'يطلب رمز التحقق - معلومات حساسة'
-  },
-  {
-    keyword: 'كود',
-    risk: 'suspicious',
-    message: 'قد يطلب معلومات حساسة'
-  },
-  {
-    keyword: 'بطاقة',
-    risk: 'danger',
-    message: 'يطلب معلومات بطاقة بنكية'
-  },
-  {
-    keyword: 'حساب بنكي',
-    risk: 'danger',
-    message: 'يطلب معلومات حساب بنكي'
-  },
-  {
-    keyword: 'poste',
-    risk: 'suspicious',
-    message: 'ينتحل صفة مؤسسة رسمية'
-  },
-  {
-    keyword: 'بريد',
-    risk: 'suspicious',
-    message: 'قد ينتحل صفة مؤسسة بريدية'
-  },
-  {
-    keyword: 'بنك',
-    risk: 'suspicious',
-    message: 'قد ينتحل صفة بنك'
-  },
-  {
-    keyword: 'steg',
-    risk: 'suspicious',
-    message: 'قد ينتحل صفة مؤسسة رسمية'
-  },
-  {
-    keyword: 'tunisie telecom',
-    risk: 'suspicious',
-    message: 'قد ينتحل صفة مؤسسة اتصالات'
-  },
-  {
-    keyword: 'دينار',
-    risk: 'suspicious',
-    message: 'يتضمن طلب مالي'
-  },
-  {
-    keyword: 'TND',
-    risk: 'suspicious',
-    message: 'يتضمن طلب مالي'
-  },
-  {
-    keyword: 'دفع',
-    risk: 'suspicious',
-    message: 'يتضمن طلب دفع'
-  },
-  {
-    keyword: 'تحويل',
-    risk: 'suspicious',
-    message: 'يتضمن طلب تحويل مالي'
-  },
-  {
-    keyword: 'tinyurl',
-    risk: 'danger',
-    message: 'رابط مختصر مريب'
-  },
-  {
-    keyword: 'short',
-    risk: 'suspicious',
-    message: 'رابط مختصر قد يخفي الوجهة'
-  }
-]
-
 export default function DetectorPage() {
   const [textInput, setTextInput] = useState('')
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null)
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [result, setResult] = useState<{
     risk: RiskLevel
     riskScore: number
@@ -174,57 +24,38 @@ export default function DetectorPage() {
     }
   } | null>(null)
   const [isAnalyzingText, setIsAnalyzingText] = useState(false)
-  const [isAnalyzingImage, setIsAnalyzingImage] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Extract URLs from text
   const extractUrls = (text: string): string[] => {
-    const urlRegex = /https?:\/\/[^\s]+/gi
-    return text.match(urlRegex) || []
+    const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/gi
+    const matches = text.match(urlRegex) || []
+    // Add https:// to www. links
+    return matches.map(url => url.startsWith('www') ? `https://${url}` : url)
   }
 
   // Analyze URL with VirusTotal API
   const analyzeUrlWithVirusTotal = async (url: string) => {
     try {
-      const response = await fetch('/api/virustotal/url', {
+      console.log('Analyzing URL:', url)
+      const response = await fetch('/api/check-url', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ url })
+        body: JSON.stringify({ url: url.trim() })
       })
 
       if (!response.ok) {
-        throw new Error('Failed to analyze URL')
+        console.error('API error:', response.statusText)
+        return null
       }
 
       const data = await response.json()
+      console.log('URLScan response:', data)
+      // return URLScan submission info (uuid, resultUrl)
       return data
     } catch (error) {
       console.error('VirusTotal URL analysis error:', error)
-      return null
-    }
-  }
-
-  // Analyze file with VirusTotal API
-  const analyzeFileWithVirusTotal = async (file: File) => {
-    try {
-      const formData = new FormData()
-      formData.append('file', file)
-
-      const response = await fetch('/api/virustotal/file', {
-        method: 'POST',
-        body: formData
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to analyze file')
-      }
-
-      const data = await response.json()
-      return data
-    } catch (error) {
-      console.error('VirusTotal file analysis error:', error)
       return null
     }
   }
@@ -239,67 +70,54 @@ export default function DetectorPage() {
     const findings: { keyword: string; risk: string; message: string }[] = []
     let virusTotalData = undefined
 
-    const inputLower = textToAnalyze.toLowerCase()
-
     // Extract and analyze URLs with VirusTotal
     const urls = extractUrls(textToAnalyze)
     if (urls.length > 0) {
-      const vtResult = await analyzeUrlWithVirusTotal(urls[0])
-      
-      if (vtResult && vtResult.data) {
-        const stats = vtResult.data.attributes.last_analysis_stats
-        virusTotalData = {
-          malicious: stats.malicious || 0,
-          suspicious: stats.suspicious || 0,
-          harmless: stats.harmless || 0,
-          undetected: stats.undetected || 0,
-          total: stats.malicious + stats.suspicious + stats.harmless + stats.undetected
+      console.log('Found URLs:', urls)
+      for (const url of urls) {
+        const vtResult = await analyzeUrlWithVirusTotal(url)
+        
+        if (vtResult?.data?.attributes) {
+          const stats = vtResult.data.attributes.last_analysis_stats || {}
+          virusTotalData = {
+            malicious: stats.malicious || 0,
+            suspicious: stats.suspicious || 0,
+            harmless: stats.harmless || 0,
+            undetected: stats.undetected || 0,
+            total: (stats.malicious || 0) + (stats.suspicious || 0) + (stats.harmless || 0) + (stats.undetected || 0)
+          }
+
+          // Add finding for URL analysis
+          if (stats.malicious && stats.malicious > 0) {
+            riskScore += 40
+            findings.push({
+              keyword: 'VirusTotal: رابط خطير 🚨',
+              risk: 'danger',
+              message: `${stats.malicious} محرك أمان اكتشف تهديداً في: ${new URL(url).hostname}`
+            })
+          } else if (stats.suspicious && stats.suspicious > 0) {
+            riskScore += 25
+            findings.push({
+              keyword: 'VirusTotal: رابط مشبوه ⚠️',
+              risk: 'suspicious',
+              message: `${stats.suspicious} محرك اعتبر الرابط مشبوهاً: ${new URL(url).hostname}`
+            })
+          } else if (stats.harmless && stats.harmless > 0) {
+            findings.push({
+              keyword: 'VirusTotal: رابط نظيف ✅',
+              risk: 'safe',
+              message: `${stats.harmless} محرك أكد أمان الرابط: ${new URL(url).hostname}`
+            })
+          }
         }
-
-        if (stats.malicious > 0) {
-          riskScore += 40
-          findings.push({
-            keyword: 'VirusTotal: رابط خطير',
-            risk: 'danger',
-            message: `${stats.malicious} محرك مكافحة فيروسات اكتشف تهديداً في هذا الرابط`
-          })
-        } else if (stats.suspicious > 0) {
-          riskScore += 25
-          findings.push({
-            keyword: 'VirusTotal: رابط مشبوه',
-            risk: 'suspicious',
-            message: `${stats.suspicious} محرك اعتبر الرابط مشبوهاً`
-          })
-        } else if (stats.harmless > 5) {
-          findings.push({
-            keyword: 'VirusTotal: رابط نظيف',
-            risk: 'safe',
-            message: `${stats.harmless} محرك أكد أن الرابط آمن`
-          })
-        }
       }
+    } else {
+      findings.push({
+        keyword: 'لم يتم العثور على روابط',
+        risk: 'safe',
+        message: 'لا توجد روابط في النص المدخل للفحص'
+      })
     }
-
-    // Check for non-.tn domains
-    for (const url of urls) {
-      if (!/\.(tn|gov\.tn|com\.tn)($|\/)/i.test(url)) {
-        riskScore += 20
-        findings.push({
-          keyword: 'رابط خارجي',
-          risk: 'suspicious',
-          message: 'الرابط لا ينتمي للموقع الرسمي (.tn أو .gov.tn)'
-        })
-      }
-    }
-
-    // Check against keyword database
-    mockAnalyses.forEach((analysis) => {
-      if (inputLower.includes(analysis.keyword.toLowerCase())) {
-        findings.push(analysis)
-        if (analysis.risk === 'danger') riskScore += 30
-        else if (analysis.risk === 'suspicious') riskScore += 15
-      }
-    })
 
     // Determine risk level
     if (riskScore >= 60) risk = 'danger'
@@ -309,92 +127,13 @@ export default function DetectorPage() {
     setResult({
       risk,
       riskScore: Math.min(riskScore, 100),
-      findings,
+      findings: [...new Map(findings.map(f => [f.keyword, f])).values()],
       virusTotalData
     })
     setIsAnalyzingText(false)
   }
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
 
-    const reader = new FileReader()
-    reader.onload = async (event) => {
-      const imageUrl = event.target?.result as string
-      setUploadedImage(imageUrl)
-      setUploadedFile(file)
-      
-      setIsAnalyzingImage(true)
-      
-      // Analyze file with VirusTotal
-      const vtResult = await analyzeFileWithVirusTotal(file)
-      
-      // Simulate OCR extraction (integrate real OCR in production)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      
-      // Mock extracted text
-      const mockExtractedText = `
-        عاجل! فزت بجائزة 1000 دينار
-        للحصول على الجائزة انقر على الرابط:
-        https://bit.ly/fake-link
-        أدخل رمز التحقق OTP وكلمة السر
-      `
-      
-      setIsAnalyzingImage(false)
-      
-      // Analyze extracted text
-      await analyzeContent(mockExtractedText)
-      
-      // Add VirusTotal results if available
-      if (vtResult && vtResult.data) {
-        const stats = vtResult.data.attributes.last_analysis_stats
-        const virusTotalData = {
-          malicious: stats.malicious || 0,
-          suspicious: stats.suspicious || 0,
-          harmless: stats.harmless || 0,
-          undetected: stats.undetected || 0,
-          total: stats.malicious + stats.suspicious + stats.harmless + stats.undetected
-        }
-
-        setResult(prev => prev ? {
-          ...prev,
-          virusTotalData,
-          riskScore: Math.min((prev.riskScore || 0) + (stats.malicious * 10), 100)
-        } : null)
-      }
-    }
-    reader.readAsDataURL(file)
-  }
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    
-    const file = e.dataTransfer.files?.[0]
-    if (file && file.type.startsWith('image/')) {
-      const fakeEvent = {
-        target: {
-          files: [file]
-        }
-      } as any
-      handleImageUpload(fakeEvent)
-    }
-  }
-
-  const removeImage = () => {
-    setUploadedImage(null)
-    setUploadedFile(null)
-    setResult(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
-  }
 
   const getRiskColor = (score: number) => {
     if (score >= 70) return 'rgb(239, 68, 68)'
@@ -572,76 +311,18 @@ export default function DetectorPage() {
 
             {/* Right side - Input sections */}
             <div className="space-y-6">
-              {/* Image Upload Section */}
-              <Card className="p-6 bg-white border-slate-200 shadow-md hover:shadow-lg transition-shadow">
-                <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-slate-900">
-                  <Upload className="h-5 w-5 text-emerald-600" />
-                  تحليل صورة (Capture d'écran)
-                </h3>
-                
-                {!uploadedImage ? (
-                  <div
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop}
-                    onClick={() => fileInputRef.current?.click()}
-                    className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 p-12 cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/50 transition-all"
-                  >
-                    <Upload className="w-12 h-12 text-slate-400 mb-3" />
-                    <p className="text-sm font-medium text-slate-700 mb-1">
-                      اسحب صورة الرسالة المشبوهة هنا
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      أو اضغط لاختيار ملف من جهازك
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="relative rounded-lg overflow-hidden border-2 border-slate-200">
-                      <img
-                        src={uploadedImage}
-                        alt="Uploaded screenshot"
-                        className="w-full h-auto max-h-64 object-contain bg-slate-50"
-                      />
-                      <button
-                        onClick={removeImage}
-                        className="absolute top-2 left-2 p-2 bg-red-500 rounded-full hover:bg-red-600 transition-all shadow-lg"
-                      >
-                        <X className="w-4 h-4 text-white" />
-                      </button>
-                    </div>
-
-                    {isAnalyzingImage && (
-                      <div className="text-center py-4">
-                        <div className="inline-block animate-spin text-3xl mb-2">⏳</div>
-                        <p className="text-sm text-slate-600">
-                          جاري استخراج النص وفحص الملف...
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-              </Card>
-
-              {/* Text/Link Input Section */}
+              {/* URL/Link Input Section */}
               <Card className="p-6 bg-white border-slate-200 shadow-md hover:shadow-lg transition-shadow">
                 <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-slate-900">
                   <Link2 className="h-5 w-5 text-emerald-600" />
-                  تحليل نص أو رابط (Link/SMS)
+                  فحص رابط (URL Scanning)
                 </h3>
                 <textarea
                   value={textInput}
                   onChange={(e) => setTextInput(e.target.value)}
-                  placeholder="انسخ هنا الرابط الذي وصلك أو محتوى الرسالة المشبوهة..."
+                  placeholder="أدخل الرابط هنا..."
                   className="mb-4 w-full rounded-lg border-2 border-slate-200 bg-white p-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-                  rows={6}
+                  rows={3}
                 />
                 <Button
                   onClick={() => analyzeContent(textInput)}
@@ -651,12 +332,12 @@ export default function DetectorPage() {
                   {isAnalyzingText ? (
                     <>
                       <span className="animate-spin me-2">⏳</span>
-                      جاري التحليل مع VirusTotal...
+                      جاري الفحص...
                     </>
                   ) : (
                     <>
                       <span className="me-2">🔍</span>
-                      ابدأ التحليل الذكي فوراً
+                      فحص الرابط
                     </>
                   )}
                 </Button>
