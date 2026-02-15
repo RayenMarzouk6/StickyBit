@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -41,42 +41,51 @@ export function Hero() {
     },
   ]
 
+    function onNavigate(arg0: string): void {
+        throw new Error('Function not implemented.')
+    }
+
   return (
 <div className="space-y-24">
-      <section className="text-center py-16 px-4 bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-900 rounded-3xl text-white shadow-2xl relative overflow-hidden">
+ <section className="text-center py-16 px-4 bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-900 rounded-3xl text-white shadow-2xl relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80')] opacity-10 bg-cover bg-center mix-blend-overlay"></div>
         <div className="relative z-10 max-w-4xl mx-auto space-y-6">
-          <div className="space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <Shield className="h-20 w-20 text-emerald-400 mx-auto mb-6" />
             <h1 className="text-4xl md:text-6xl font-bold mb-4 leading-tight">
-              دافع على روحك في <span className="text-emerald-400">العالم الرقمي</span>
+              دافع على روحك في{" "}
+              <span className="text-emerald-400">
+                العالم الرقمي
+              </span>
             </h1>
             <p className="text-xl md:text-2xl text-slate-300 mb-8 max-w-2xl mx-auto">
-              أول منصة تونسية ذكية لحمايتك من التحيل الإلكتروني، سرقة البيانات، والابتزاز.
+              أول منصة تونسية ذكية لحمايتك من التحيل الإلكتروني،
+              سرقة البيانات، والابتزاز.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
-                asChild
                 size="lg"
                 className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-8 py-6 text-xl shadow-lg shadow-emerald-500/20"
+                onClick={() => onNavigate("investigator")}
               >
-                <Link href="/simulator" className="flex items-center justify-center gap-2">
-                  <span>جرب المحقق الرقمي</span>
-                  <ArrowLeft className="h-5 w-5 rotate-180" aria-hidden="true" />
-                </Link>
+                جرب المحقق الرقمي
+                <ArrowLeft className="mr-2 h-5 w-5 rotate-180" />{" "}
+                {/* RTL arrow fix */}
               </Button>
               <Button
-                asChild
                 variant="outline"
                 size="lg"
                 className="border-slate-400 text-slate-200 hover:bg-slate-800 hover:text-white px-8 py-6 text-xl"
+                onClick={() => onNavigate("analyzer")}
               >
-                <Link href="/detector" className="flex items-center justify-center gap-2">
-                  <span>فحص رابط مشبوه</span>
-                </Link>
+                فحص رابط مشبوه
               </Button>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 {/* 

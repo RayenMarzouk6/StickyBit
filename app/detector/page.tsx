@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Header } from '@/components/shared/header'
 import { Footer } from '@/components/shared/footer'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
-import { AlertTriangle, CheckCircle, AlertCircle } from 'lucide-react'
+import { AlertTriangle, CheckCircle, AlertCircle, Upload, X, Link2, Info } from 'lucide-react'
 import Link from 'next/link'
 
 type RiskLevel = null | 'safe' | 'suspicious' | 'danger'
@@ -36,22 +36,145 @@ const mockAnalyses = [
     keyword: 'عاجل',
     risk: 'suspicious',
     message: 'إنشاء جو من الضغط والاستعجالية'
+  },
+  {
+    keyword: 'جائزة',
+    risk: 'danger',
+    message: 'وعود بجوائز مجانية - احتيال شائع'
+  },
+  {
+    keyword: 'ربحت',
+    risk: 'danger',
+    message: 'وعود بجوائز مجانية - احتيال شائع'
+  },
+  {
+    keyword: 'مبروك',
+    risk: 'suspicious',
+    message: 'قد تكون رسالة تصيد احتيالي'
+  },
+  {
+    keyword: 'فزت',
+    risk: 'danger',
+    message: 'وعود بجوائز مجانية - احتيال شائع'
+  },
+  {
+    keyword: 'فوراً',
+    risk: 'suspicious',
+    message: 'يستعمل أسلوب الاستعجال للضغط'
+  },
+  {
+    keyword: 'آخر فرصة',
+    risk: 'suspicious',
+    message: 'يستعمل أسلوب الاستعجال للضغط'
+  },
+  {
+    keyword: 'سارع',
+    risk: 'suspicious',
+    message: 'يستعمل أسلوب الاستعجال للضغط'
+  },
+  {
+    keyword: 'كلمة السر',
+    risk: 'danger',
+    message: 'يطلب معلومات حساسة'
+  },
+  {
+    keyword: 'رمز التحقق',
+    risk: 'danger',
+    message: 'يطلب معلومات حساسة'
+  },
+  {
+    keyword: 'OTP',
+    risk: 'danger',
+    message: 'يطلب رمز التحقق - معلومات حساسة'
+  },
+  {
+    keyword: 'كود',
+    risk: 'suspicious',
+    message: 'قد يطلب معلومات حساسة'
+  },
+  {
+    keyword: 'بطاقة',
+    risk: 'danger',
+    message: 'يطلب معلومات بطاقة بنكية'
+  },
+  {
+    keyword: 'حساب بنكي',
+    risk: 'danger',
+    message: 'يطلب معلومات حساب بنكي'
+  },
+  {
+    keyword: 'poste',
+    risk: 'suspicious',
+    message: 'ينتحل صفة مؤسسة رسمية'
+  },
+  {
+    keyword: 'بريد',
+    risk: 'suspicious',
+    message: 'قد ينتحل صفة مؤسسة بريدية'
+  },
+  {
+    keyword: 'بنك',
+    risk: 'suspicious',
+    message: 'قد ينتحل صفة بنك'
+  },
+  {
+    keyword: 'steg',
+    risk: 'suspicious',
+    message: 'قد ينتحل صفة مؤسسة رسمية'
+  },
+  {
+    keyword: 'tunisie telecom',
+    risk: 'suspicious',
+    message: 'قد ينتحل صفة مؤسسة اتصالات'
+  },
+  {
+    keyword: 'دينار',
+    risk: 'suspicious',
+    message: 'يتضمن طلب مالي'
+  },
+  {
+    keyword: 'TND',
+    risk: 'suspicious',
+    message: 'يتضمن طلب مالي'
+  },
+  {
+    keyword: 'دفع',
+    risk: 'suspicious',
+    message: 'يتضمن طلب دفع'
+  },
+  {
+    keyword: 'تحويل',
+    risk: 'suspicious',
+    message: 'يتضمن طلب تحويل مالي'
+  },
+  {
+    keyword: 'tinyurl',
+    risk: 'danger',
+    message: 'رابط مختصر مريب'
+  },
+  {
+    keyword: 'short',
+    risk: 'suspicious',
+    message: 'رابط مختصر قد يخفي الوجهة'
   }
 ]
 
 export default function DetectorPage() {
-  const [input, setInput] = useState('')
+  const [textInput, setTextInput] = useState('')
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null)
   const [result, setResult] = useState<{
     risk: RiskLevel
     riskScore: number
     findings: { keyword: string; risk: string; message: string }[]
   } | null>(null)
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [isAnalyzingText, setIsAnalyzingText] = useState(false)
+  const [isAnalyzingImage, setIsAnalyzingImage] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const analyzeContent = async () => {
-    if (!input.trim()) return
+  const analyzeContent = async (textToAnalyze: string) => {
+    if (!textToAnalyze.trim()) return
 
-    setIsAnalyzing(true)
+    setIsAnalyzingText(true)
 
     // Simulate API call delay
     await new Promise((resolve) => setTimeout(resolve, 1500))
@@ -60,7 +183,22 @@ export default function DetectorPage() {
     let riskScore = 0
     const findings: { keyword: string; risk: string; message: string }[] = []
 
-    const inputLower = input.toLowerCase()
+    const inputLower = textToAnalyze.toLowerCase()
+
+    // Check for URLs and non-.tn domains
+    const urlRegex = /https?:\/\/[^\s]+/gi
+    const urls = inputLower.match(urlRegex) || []
+    
+    for (const url of urls) {
+      if (!/\.(tn|gov\.tn|com\.tn)($|\/)/i.test(url)) {
+        riskScore += 30
+        findings.push({
+          keyword: 'رابط خارجي',
+          risk: 'danger',
+          message: 'الرابط لا ينتمي للموقع الرسمي (.tn أو .gov.tn)'
+        })
+      }
+    }
 
     mockAnalyses.forEach((analysis) => {
       if (inputLower.includes(analysis.keyword.toLowerCase())) {
@@ -80,206 +218,302 @@ export default function DetectorPage() {
       riskScore: Math.min(riskScore, 100),
       findings
     })
-    setIsAnalyzing(false)
+    setIsAnalyzingText(false)
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && e.ctrlKey) {
-      analyzeContent()
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = async (event) => {
+      const imageUrl = event.target?.result as string
+      setUploadedImage(imageUrl)
+      
+      // Simulate OCR extraction
+      setIsAnalyzingImage(true)
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      
+      // Mock extracted text - in production, use real OCR
+      const mockExtractedText = `
+        عاجل! فزت بجائزة 1000 دينار
+        للحصول على الجائزة انقر على الرابط:
+        https://bit.ly/fake-link
+        أدخل رمز التحقق OTP وكلمة السر
+      `
+      
+      setIsAnalyzingImage(false)
+      
+      // Auto-analyze after extraction
+      await analyzeContent(mockExtractedText)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    const file = e.dataTransfer.files?.[0]
+    if (file && file.type.startsWith('image/')) {
+      const fakeEvent = {
+        target: {
+          files: [file]
+        }
+      } as any
+      handleImageUpload(fakeEvent)
     }
   }
 
-  const getRiskColor = (risk: RiskLevel) => {
-    switch (risk) {
-      case 'safe':
-        return { bg: 'bg-safe/10', border: 'border-safe', text: 'text-safe', icon: CheckCircle }
-      case 'suspicious':
-        return { bg: 'bg-warning/10', border: 'border-warning', text: 'text-warning', icon: AlertCircle }
-      case 'danger':
-        return { bg: 'bg-danger/10', border: 'border-danger', text: 'text-danger', icon: AlertTriangle }
-      default:
-        return { bg: '', border: '', text: '', icon: AlertCircle }
+  const removeImage = () => {
+    setUploadedImage(null)
+    setResult(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
     }
   }
 
-  const getRiskLabel = (risk: RiskLevel) => {
-    switch (risk) {
-      case 'safe':
-        return 'آمن'
-      case 'suspicious':
-        return 'مشبوه'
-      case 'danger':
-        return 'خطير'
-      default:
-        return ''
-    }
+  const getRiskColor = (score: number) => {
+    if (score >= 70) return 'rgb(239, 68, 68)' // red-500
+    if (score >= 40) return 'rgb(245, 158, 11)' // amber-500
+    return 'rgb(16, 185, 129)' // emerald-500
   }
 
-  const colors = result ? getRiskColor(result.risk) : {}
-  const Icon = colors.icon
+  const getRiskBgColor = (score: number) => {
+    if (score >= 70) return 'bg-red-50'
+    if (score >= 40) return 'bg-amber-50'
+    return 'bg-emerald-50'
+  }
+
+  const getRiskBorderColor = (score: number) => {
+    if (score >= 70) return 'border-red-200'
+    if (score >= 40) return 'border-amber-200'
+    return 'border-emerald-200'
+  }
+
+  const getRiskLabel = (score: number) => {
+    if (score >= 70) return 'تهديد مرتفع: محاولة احتيال مالي'
+    if (score >= 40) return 'مشبوه: يحتاج تحقق'
+    return 'آمن نسبياً'
+  }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-slate-50">
       <Header />
       <main className="flex-1 py-8 md:py-12">
-        <div className="container mx-auto px-4 max-w-2xl">
-          {/* Title */}
-          <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-              تأكّد قبل ما تضغط
+        <div className="container mx-auto px-4 max-w-7xl">
+          {/* Page Header */}
+          <div className="text-center mb-12">
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              محلل التهديدات الذكي
             </h1>
-            <p className="text-muted-foreground">
-              الصق رسالة أو رابط لنفحص إذا كان آمناً أم مريباً
+            <p className="text-slate-600 text-lg max-w-2xl mx-auto">
+              حلّل أي رسالة أو رابط أو صورة مشبوهة للكشف عن محاولات الاحتيال
             </p>
           </div>
-
-          {/* Input Card */}
-          {!result && (
-            <Card className="p-6 md:p-8 mb-8 border-border">
-              <label className="block mb-4">
-                <p className="text-sm font-semibold text-foreground mb-2">الرسالة أو الرابط</p>
-                <Textarea
-                  placeholder="الصق الرسالة أو الرابط المريب هنا..."
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  className="min-h-32 font-mono text-sm"
-                />
-              </label>
-
-              <Button
-                onClick={analyzeContent}
-                disabled={!input.trim() || isAnalyzing}
-                size="lg"
-                className="w-full h-touch bg-primary hover:bg-primary/90 text-primary-foreground text-base font-semibold"
-              >
-                {isAnalyzing ? (
-                  <>
-                    <span className="animate-spin me-2">⏳</span>
-                    جاري الفحص...
-                  </>
-                ) : (
-                  <>
-                    <span className="me-2">🔍</span>
-                    فحص
-                  </>
-                )}
-              </Button>
-
-              <p className="text-xs text-muted-foreground text-center mt-4">
-                أو اضغط Ctrl + Enter للفحص السريع
-              </p>
-            </Card>
-          )}
-
-          {/* Result Card */}
-          {result && (
+          
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Left side - Risk Score Circle */}
             <div className="space-y-6">
-              <Card className={`p-8 border-2 ${colors.border} ${colors.bg}`}>
-                {/* Result Header */}
-                <div className="flex items-start gap-4 mb-6">
-                  {Icon && <Icon className={`w-10 h-10 ${colors.text} flex-shrink-0 mt-1`} />}
-                  <div>
-                    <h2 className={`text-3xl font-bold ${colors.text}`}>
-                      {result.risk === 'safe' && '🟢'}
-                      {result.risk === 'suspicious' && '🟠'}
-                      {result.risk === 'danger' && '🔴'}
-                      {' '}
-                      {getRiskLabel(result.risk)}
-                    </h2>
-                    <p className="text-muted-foreground text-sm mt-1">
-                      {result.risk === 'safe' && 'هذا المحتوى يبدو آمناً'}
-                      {result.risk === 'suspicious' && 'هذا المحتوى قد يكون مريباً - كن حذراً'}
-                      {result.risk === 'danger' && 'هذا المحتوى قد يكون خطيراً جداً - لا تتفاعل معه'}
-                    </p>
+              <Card className="p-8 bg-white border-slate-200 shadow-md">
+                <div className="flex flex-col items-center">
+                  {/* Circular progress */}
+                  <div className="relative h-64 w-64 mb-6">
+                    <svg className="h-full w-full -rotate-90" viewBox="0 0 200 200">
+                      <circle 
+                        cx="100" 
+                        cy="100" 
+                        r="85" 
+                        fill="none" 
+                        stroke="#e2e8f0" 
+                        strokeWidth="12" 
+                      />
+                      <circle
+                        cx="100"
+                        cy="100"
+                        r="85"
+                        fill="none"
+                        stroke={result ? getRiskColor(result.riskScore) : '#e2e8f0'}
+                        strokeWidth="12"
+                        strokeLinecap="round"
+                        strokeDasharray={`${(result?.riskScore || 0) * 5.34} 534`}
+                        className="transition-all duration-1000"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span 
+                        className="text-6xl font-black"
+                        style={{ color: result ? getRiskColor(result.riskScore) : '#94a3b8' }}
+                      >
+                        {result?.riskScore || 0}%
+                      </span>
+                      <span className="text-sm text-slate-500 mt-2">درجة الخطر</span>
+                    </div>
                   </div>
-                </div>
 
-                {/* Risk Score */}
-                <div className="mb-6">
-                  <div className="flex justify-between mb-2">
-                    <span className="text-sm font-semibold text-foreground">درجة الخطورة</span>
-                    <span className="text-sm font-semibold text-foreground">{result.riskScore}%</span>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-                    <div
-                      className={`h-full transition-all duration-300 ${
-                        result.risk === 'safe' ? 'bg-safe' : result.risk === 'suspicious' ? 'bg-warning' : 'bg-danger'
+                  {result && (
+                    <div 
+                      className={`rounded-full px-6 py-2 text-sm font-semibold ${
+                        result.riskScore >= 70
+                          ? 'bg-red-100 text-red-700'
+                          : result.riskScore >= 40
+                          ? 'bg-amber-100 text-amber-700'
+                          : 'bg-emerald-100 text-emerald-700'
                       }`}
-                      style={{ width: `${result.riskScore}%` }}
-                    />
-                  </div>
+                    >
+                      {getRiskLabel(result.riskScore)}
+                    </div>
+                  )}
                 </div>
-
-                {/* Findings */}
-                {result.findings.length > 0 && (
-                  <div>
-                    <h3 className="font-semibold text-foreground mb-3">المؤشرات المكتشفة</h3>
-                    <ul className="space-y-2">
-                      {result.findings.map((finding, index) => (
-                        <li key={index} className="text-sm p-3 bg-background rounded border border-border">
-                          <p className="font-semibold text-foreground">{finding.keyword}</p>
-                          <p className="text-muted-foreground text-xs mt-1">{finding.message}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {result.findings.length === 0 && (
-                  <p className="text-sm text-muted-foreground">لم يتم اكتشاف مؤشرات مريبة معروفة</p>
-                )}
               </Card>
+
+              {/* Indicators */}
+              {result && result.findings.length > 0 && (
+                <Card className="p-6 bg-white border-slate-200 shadow-md">
+                  <h3 className="mb-4 flex items-center gap-2 font-bold text-slate-900">
+                    <Info className="h-5 w-5 text-emerald-600" />
+                    لماذا يعتبر هذا تهديداً؟
+                  </h3>
+                  <ul className="space-y-3">
+                    {result.findings.map((finding, i) => (
+                      <li key={i} className="flex items-start gap-3 text-sm border-b border-slate-100 pb-3 last:border-0 last:pb-0">
+                        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
+                        <div>
+                          <p className="text-slate-900 font-semibold">{finding.keyword}</p>
+                          <p className="text-slate-600 text-xs mt-1">{finding.message}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
+              )}
 
               {/* Recommendations */}
-              <Card className="p-6 bg-secondary/50 border-border">
-                <h3 className="font-semibold text-foreground mb-4">الخطوات الموصى بها</h3>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  {result.risk === 'safe' && (
-                    <>
-                      <li>✓ يبدو أن هذا المحتوى آمن</li>
-                      <li>✓ مع ذلك، كن حذراً دائماً من الروابط غير المتوقعة</li>
-                    </>
-                  )}
-                  {result.risk === 'suspicious' && (
-                    <>
-                      <li>⚠ تجنب النقر على الروابط من هذا المحتوى</li>
-                      <li>⚠ لا تشارك بيانات شخصية</li>
-                      <li>⚠ إذا كانت من شخص موثوق، تحقق معه مباشرة</li>
-                    </>
-                  )}
-                  {result.risk === 'danger' && (
-                    <>
-                      <li>🚫 لا تنقر على أي روابط من هذا المحتوى</li>
-                      <li>🚫 لا تشارك أي بيانات شخصية</li>
-                      <li>🚫 إذا كانت من حساب موثوق، تنبه صاحب الحساب</li>
-                      <li>🚫 كن حذراً وقم بحذف الرسالة</li>
-                    </>
-                  )}
-                </ul>
+              {result && (
+                <Card className={`p-6 border-2 ${
+                  result.riskScore >= 70
+                    ? 'bg-red-50 border-red-200'
+                    : result.riskScore >= 40
+                    ? 'bg-amber-50 border-amber-200'
+                    : 'bg-emerald-50 border-emerald-200'
+                }`}>
+                  <h4 className="mb-3 flex items-center gap-2 font-bold text-slate-900">
+                    <CheckCircle className={`h-5 w-5 ${
+                      result.riskScore >= 70
+                        ? 'text-red-600'
+                        : result.riskScore >= 40
+                        ? 'text-amber-600'
+                        : 'text-emerald-600'
+                    }`} />
+                    نصيحة فورية
+                  </h4>
+                  <p className="text-sm text-slate-700 leading-relaxed">
+                    {result.riskScore >= 70 && '⛔ خطر عالي! لا تضغط على أي رابط ولا تعطي أي معلومات. بلّغ فوراً.'}
+                    {result.riskScore >= 40 && result.riskScore < 70 && '⚠️ مشبوه! تحقق من المصدر الرسمي قبل أي تفاعل.'}
+                    {result.riskScore < 40 && '✅ يبدو آمناً، لكن كن حذراً دائماً مع الرسائل من مصادر غير معروفة.'}
+                  </p>
+                </Card>
+              )}
+            </div>
+
+            {/* Right side - Input sections */}
+            <div className="space-y-6">
+              {/* Image Upload Section */}
+              <Card className="p-6 bg-white border-slate-200 shadow-md hover:shadow-lg transition-shadow">
+                <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-slate-900">
+                  <Upload className="h-5 w-5 text-emerald-600" />
+                  تحليل صورة (Capture d'écran)
+                </h3>
+                
+                {!uploadedImage ? (
+                  <div
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 p-12 cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/50 transition-all"
+                  >
+                    <Upload className="w-12 h-12 text-slate-400 mb-3" />
+                    <p className="text-sm font-medium text-slate-700 mb-1">
+                      اسحب صورة الرسالة المشبوهة هنا
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      أو اضغط لاختيار ملف من جهازك
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="relative rounded-lg overflow-hidden border-2 border-slate-200">
+                      <img
+                        src={uploadedImage}
+                        alt="Uploaded screenshot"
+                        className="w-full h-auto max-h-64 object-contain bg-slate-50"
+                      />
+                      <button
+                        onClick={removeImage}
+                        className="absolute top-2 left-2 p-2 bg-red-500 rounded-full hover:bg-red-600 transition-all shadow-lg"
+                      >
+                        <X className="w-4 h-4 text-white" />
+                      </button>
+                    </div>
+
+                    {isAnalyzingImage && (
+                      <div className="text-center py-4">
+                        <div className="inline-block animate-spin text-3xl mb-2">⏳</div>
+                        <p className="text-sm text-slate-600">
+                          جاري استخراج النص من الصورة...
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
               </Card>
 
-              {/* Actions */}
-              <div className="space-y-3">
+              {/* Text/Link Input Section */}
+              <Card className="p-6 bg-white border-slate-200 shadow-md hover:shadow-lg transition-shadow">
+                <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-slate-900">
+                  <Link2 className="h-5 w-5 text-emerald-600" />
+                  تحليل نص أو رابط (Link/SMS)
+                </h3>
+                <textarea
+                  value={textInput}
+                  onChange={(e) => setTextInput(e.target.value)}
+                  placeholder="انسخ هنا الرابط الذي وصلك أو محتوى الرسالة المشبوهة..."
+                  className="mb-4 w-full rounded-lg border-2 border-slate-200 bg-white p-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  rows={6}
+                />
                 <Button
-                  onClick={() => {
-                    setResult(null)
-                    setInput('')
-                  }}
-                  size="lg"
-                  className="w-full h-touch bg-primary hover:bg-primary/90 text-primary-foreground text-base font-semibold"
+                  onClick={() => analyzeContent(textInput)}
+                  disabled={isAnalyzingText || !textInput.trim()}
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-6 text-base shadow-lg shadow-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  فحص رسالة أخرى
+                  {isAnalyzingText ? (
+                    <>
+                      <span className="animate-spin me-2">⏳</span>
+                      جاري التحليل...
+                    </>
+                  ) : (
+                    <>
+                      <span className="me-2">🔍</span>
+                      ابدأ التحليل الذكي فوراً
+                    </>
+                  )}
                 </Button>
-
-                <Link href="/report" className="block">
-                  <Button variant="outline" size="lg" className="w-full h-touch text-base font-semibold">
-                    بلّغ عن هذا المحتوى
-                  </Button>
-                </Link>
-              </div>
+              </Card>
             </div>
-          )}
+          </div>
         </div>
       </main>
       <Footer />
