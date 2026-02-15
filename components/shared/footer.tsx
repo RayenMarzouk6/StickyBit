@@ -1,44 +1,66 @@
 'use client'
 
 import Link from 'next/link'
+import { Shield, Twitter, Facebook, Instagram, Mail } from 'lucide-react'
 
 export function Footer() {
   return (
-    <footer className="bg-secondary text-secondary-foreground border-t border-border mt-12">
-      <div className="container mx-auto px-4 py-8">
+    <footer className="bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-900 text-white border-t border-emerald-500/20 mt-12 relative overflow-hidden">
+      {/* Background overlay effect */}
+      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80')] opacity-5 bg-cover bg-center mix-blend-overlay"></div>
+      
+      <div className="container mx-auto px-4 py-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* About */}
           <div>
-            <h3 className="font-bold text-lg mb-3 flex items-center gap-2">
-              <span>🛡️</span>
-              <span>CyberAman</span>
+            <h3 className="font-bold text-xl mb-4 flex items-center gap-2">
+              <Shield className="h-7 w-7 text-emerald-400" />
+              <span>
+                Cyber<span className="text-emerald-400">Aman</span>
+              </span>
             </h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-slate-300 leading-relaxed">
               منصة تثقيفية لحماية نفسك من الاحتيالات الإلكترونية والتصيد الاحتيالي
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold mb-3">روابط سريعة</h4>
-            <ul className="space-y-2 text-sm">
+            <h4 className="font-semibold text-emerald-400 mb-4">روابط سريعة</h4>
+            <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/" className="hover:underline text-muted-foreground hover:text-foreground">
+                <Link 
+                  href="/" 
+                  className="text-slate-300 hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                   الرئيسية
                 </Link>
               </li>
               <li>
-                <Link href="/academy" className="hover:underline text-muted-foreground hover:text-foreground">
+                <Link 
+                  href="/academy" 
+                  className="text-slate-300 hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                   الأكاديمية
                 </Link>
               </li>
               <li>
-                <Link href="/glossary" className="hover:underline text-muted-foreground hover:text-foreground">
+                <Link 
+                  href="/glossary" 
+                  className="text-slate-300 hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                   القاموس
                 </Link>
               </li>
               <li>
-                <Link href="/report" className="hover:underline text-muted-foreground hover:text-foreground">
+                <Link 
+                  href="/report" 
+                  className="text-slate-300 hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                   بلّغ عن احتيال
                 </Link>
               </li>
@@ -47,25 +69,41 @@ export function Footer() {
 
           {/* Tools */}
           <div>
-            <h4 className="font-semibold mb-3">الأدوات</h4>
-            <ul className="space-y-2 text-sm">
+            <h4 className="font-semibold text-emerald-400 mb-4">الأدوات</h4>
+            <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/detector" className="hover:underline text-muted-foreground hover:text-foreground">
+                <Link 
+                  href="/detector" 
+                  className="text-slate-300 hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                   كاشف الاحتيالات
                 </Link>
               </li>
               <li>
-                <Link href="/simulator" className="hover:underline text-muted-foreground hover:text-foreground">
+                <Link 
+                  href="/simulator" 
+                  className="text-slate-300 hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                   محاكي الهجوم
                 </Link>
               </li>
               <li>
-                <Link href="/assessment" className="hover:underline text-muted-foreground hover:text-foreground">
+                <Link 
+                  href="/assessment" 
+                  className="text-slate-300 hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                   اختبر أمانك
                 </Link>
               </li>
               <li>
-                <Link href="/recovery" className="hover:underline text-muted-foreground hover:text-foreground">
+                <Link 
+                  href="/recovery" 
+                  className="text-slate-300 hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                   دليل التعافي
                 </Link>
               </li>
@@ -74,25 +112,41 @@ export function Footer() {
 
           {/* Resources */}
           <div>
-            <h4 className="font-semibold mb-3">موارد</h4>
-            <ul className="space-y-2 text-sm">
+            <h4 className="font-semibold text-emerald-400 mb-4">موارد</h4>
+            <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/profile" className="hover:underline text-muted-foreground hover:text-foreground">
+                <Link 
+                  href="/profile" 
+                  className="text-slate-300 hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                   ملفي الشخصي
                 </Link>
               </li>
               <li>
-                <a href="#" className="hover:underline text-muted-foreground hover:text-foreground">
+                <a 
+                  href="#" 
+                  className="text-slate-300 hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                   الشروط والأحكام
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:underline text-muted-foreground hover:text-foreground">
+                <a 
+                  href="#" 
+                  className="text-slate-300 hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                   سياسة الخصوصية
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:underline text-muted-foreground hover:text-foreground">
+                <a 
+                  href="#" 
+                  className="text-slate-300 hover:text-emerald-400 transition-colors flex items-center gap-2 group"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                   تواصل معنا
                 </a>
               </li>
@@ -101,17 +155,38 @@ export function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="border-t border-border pt-6 flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
-          <p>&copy; 2024 CyberAman. جميع الحقوق محفوظة.</p>
+        <div className="border-t border-emerald-500/20 pt-8 flex flex-col md:flex-row justify-between items-center text-sm">
+          <p className="text-slate-400">
+            &copy; 2024 <span className="text-emerald-400 font-semibold">CyberAman</span>. جميع الحقوق محفوظة.
+          </p>
           <div className="flex gap-4 mt-4 md:mt-0">
-            <a href="#" className="hover:text-foreground">
-              تويتر
+            <a 
+              href="#" 
+              className="text-slate-400 hover:text-emerald-400 transition-all hover:scale-110"
+              aria-label="Twitter"
+            >
+              <Twitter className="w-5 h-5" />
             </a>
-            <a href="#" className="hover:text-foreground">
-              فيسبوك
+            <a 
+              href="#" 
+              className="text-slate-400 hover:text-emerald-400 transition-all hover:scale-110"
+              aria-label="Facebook"
+            >
+              <Facebook className="w-5 h-5" />
             </a>
-            <a href="#" className="hover:text-foreground">
-              انستغرام
+            <a 
+              href="#" 
+              className="text-slate-400 hover:text-emerald-400 transition-all hover:scale-110"
+              aria-label="Instagram"
+            >
+              <Instagram className="w-5 h-5" />
+            </a>
+            <a 
+              href="#" 
+              className="text-slate-400 hover:text-emerald-400 transition-all hover:scale-110"
+              aria-label="Email"
+            >
+              <Mail className="w-5 h-5" />
             </a>
           </div>
         </div>
